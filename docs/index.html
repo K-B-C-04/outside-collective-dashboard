@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Outside Collective Performance</title>
+<meta name="description" content="Events, conversion, retention and content performance for Outside Collective, a Washington DC social events community.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f6f7f3; --surface:#fff; --ink:#14201a; --muted:#5f6b64; --line:#e3e7e1;
+  --accent:#2f6b3f; --accent-soft:#e9f3ec; --sun:#b7791f; --sun-soft:#fdf6e3; --coral:#c2410c; --coral-soft:#fff1eb;
+  --ok:#15803d; --ok-soft:#f0fdf4; --calm:#cbd5e1;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 16px 48px}
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:40px;height:40px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+h1{font-size:20px;margin:0}
+.sub{color:var(--muted);font-size:13px;margin:0}
+.banner{background:var(--sun-soft);border:1px solid #f3dfa8;color:#6b4a0f;border-radius:10px;padding:8px 12px;font-size:12.5px;margin-bottom:16px}
+nav.tabs{display:flex;gap:4px;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:18px}
+nav.tabs button{flex:1 1 auto;border:0;background:none;padding:10px 14px;border-radius:8px;font:600 13px Inter,sans-serif;color:var(--muted);cursor:pointer;min-height:44px}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:#fff}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.kpi .label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi .value{font:600 28px/1.2 var(--mono);margin-top:6px}
+.kpi .note{font-size:12px;color:var(--muted)}
+.kpi.good .value{color:var(--ok)} .kpi.sun .value{color:var(--sun)} .kpi.coral .value{color:var(--coral)}
+h2{font-size:15px;margin:0 0 2px}
+.card .desc{color:var(--muted);font-size:12.5px;margin:0 0 12px}
+.chart{position:relative;height:270px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;margin-bottom:14px}
+.filters label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+select{font:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;color:var(--ink);min-height:40px}
+.table-box{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:860px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:top}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td .sub{font-size:11.5px;color:var(--muted)}
+.strong{font-weight:600}
+.pill{display:inline-block;white-space:nowrap;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.p-green{background:var(--accent-soft);color:var(--accent)} .p-sun{background:var(--sun-soft);color:var(--sun)}
+.p-coral{background:var(--coral-soft);color:var(--coral)} .p-mute{background:#f1f3f0;color:var(--muted)}
+.btn{border:0;background:var(--accent);color:#fff;font:600 13px Inter,sans-serif;padding:10px 14px;border-radius:8px;cursor:pointer;min-height:44px}
+.btn.ghost{background:#fff;color:var(--accent);border:1px solid var(--line)}
+.decisions{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+.decision{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.decision .tag{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.decision h3{font-size:14px;margin:4px 0 6px}
+.decision p{margin:0;font-size:13px;color:#33413a}
+.decision .act{margin-top:8px;font-size:12.5px}
+.funnel{display:grid;gap:8px}
+.step{display:grid;grid-template-columns:160px 1fr 70px;gap:10px;align-items:center;font-size:13px}
+.bar{height:26px;border-radius:6px;background:var(--accent);min-width:2px}
+.step .v{font:600 13px var(--mono);text-align:right}
+.step .lbl{color:var(--muted)}
+.rate{font-size:11.5px;color:var(--muted);margin:-2px 0 2px 170px}
+[hidden]{display:none!important}
+footer{margin-top:28px;color:var(--muted);font-size:12px;text-align:center}
+@media (max-width:640px){.kpi .value{font-size:24px}.step{grid-template-columns:110px 1fr 56px}.rate{margin-left:120px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">OC</div>
+      <div>
+        <h1>Outside Collective Performance</h1>
+        <p class="sub">Washington DC social events community · Posh ticketing and Instagram · Data as of <span id="asof"></span></p>
+      </div>
+    </div>
+    <a class="btn ghost" href="https://github.com/K-B-C-04/outside-collective-dashboard" style="text-decoration:none;display:inline-flex;align-items:center">View on GitHub</a>
+  </header>
+  <div class="banner"><strong>Data note:</strong> Ticket, attendance and Instagram figures are actual totals. Revenue and pricing figures are illustrative. No attendee or follower personal data is included.</div>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" aria-selected="true" data-tab="overview">Overview</button>
+    <button role="tab" aria-selected="false" data-tab="events">Events &amp; operations</button>
+    <button role="tab" aria-selected="false" data-tab="growth">Conversion &amp; retention</button>
+    <button role="tab" aria-selected="false" data-tab="content">Content</button>
+  </nav>
+
+  <!-- OVERVIEW -->
+  <section id="overview" role="tabpanel">
+    <div class="grid kpis" id="ov-kpis"></div>
+    <h2 style="margin:22px 0 10px;font-size:16px">What the data says to do next</h2>
+    <div class="decisions" id="ov-decisions"></div>
+    <div class="grid two" style="margin-top:14px">
+      <div class="card"><h2>Tickets by event</h2><p class="desc">Colored by event type. The January trip is on sale now.</p><div class="chart"><canvas id="ov-tickets"></canvas></div></div>
+      <div class="card"><h2>Lead-to-attendance funnel</h2><p class="desc">Totals across all events. Instagram views reach the page through shared links and the bio.</p><div class="funnel" id="ov-funnel"></div></div>
+    </div>
+  </section>
+
+  <!-- EVENTS & OPERATIONS -->
+  <section id="events" role="tabpanel" hidden>
+    <div class="filters">
+      <label>Event type<select id="ev-type"></select></label>
+      <label>Admission<select id="ev-paid"><option value="">All</option><option value="paid">Paid</option><option value="free">Free / RSVP</option></select></label>
+    </div>
+    <div class="grid kpis" id="ev-kpis"></div>
+    <div class="grid two" style="margin-top:14px">
+      <div class="card"><h2>Booking lead time</h2><p class="desc">Share of orders placed 8+ days before the event. Planned outings give weeks of certainty; socials fill late.</p><div class="chart"><canvas id="ev-lead"></canvas></div></div>
+      <div class="card"><h2>Capacity and attendance</h2><p class="desc">Sell-through where a cap was set; check-in rate where tickets were scanned.</p><div class="chart"><canvas id="ev-cap"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2>Event log</h2><p class="desc" id="ev-count"></p>
+      <div class="table-box"><table><thead><tr><th>Event</th><th>Type</th><th>Location</th><th class="num">Tickets</th><th class="num">Capacity</th><th class="num">Sell-through</th><th class="num">Checked in</th><th class="num">Page visits</th><th class="num">Conversion</th><th class="num">Booked 8+ days out</th><th class="num">Revenue*</th></tr></thead><tbody id="ev-rows"></tbody></table></div>
+      <p class="desc" style="margin:10px 0 0">*Illustrative figures, not actual revenue.</p>
+    </div>
+  </section>
+
+  <!-- CONVERSION & RETENTION -->
+  <section id="growth" role="tabpanel" hidden>
+    <div class="grid kpis" id="gr-kpis"></div>
+    <div class="grid two" style="margin-top:14px">
+      <div class="card"><h2>Page visits to tickets</h2><p class="desc">Event page visits and tickets per event, with conversion rate. Hover for the event name.</p><div class="chart"><canvas id="gr-conv"></canvas></div></div>
+      <div class="card"><h2>First-time vs returning buyers</h2><p class="desc">Unique buyers per event, by event date. Hover for the event name.</p><div class="chart"><canvas id="gr-ret"></canvas></div></div>
+      <div class="card"><h2>Where tickets come from</h2><p class="desc">Posh ticket sources. Shared links and the Instagram bio arrive as direct page traffic.</p><div class="chart"><canvas id="gr-src"></canvas></div></div>
+      <div class="card"><h2>Returning share over time</h2><p class="desc">Returning buyers as a share of each event's buyers.</p><div class="chart"><canvas id="gr-share"></canvas></div></div>
+    </div>
+  </section>
+
+  <!-- CONTENT -->
+  <section id="content" role="tabpanel" hidden>
+    <div class="filters">
+      <label>Format<select id="ct-format"><option value="">All</option><option value="reel">Reels</option><option value="carousel">Carousels</option><option value="image">Images</option></select></label>
+      <label>Purpose<select id="ct-purpose"><option value="">All</option><option value="event_promo">Event promo</option><option value="event_recap">Event recap</option><option value="community">Community</option></select></label>
+    </div>
+    <div class="grid kpis" id="ct-kpis"></div>
+    <div class="grid two" style="margin-top:14px">
+      <div class="card"><h2>Views and posting cadence by month</h2><p class="desc">November is month to date.</p><div class="chart"><canvas id="ct-monthly"></canvas></div></div>
+      <div class="card"><h2>Median performance per post</h2><p class="desc">By format and purpose, for posts in the current filter.</p><div class="chart"><canvas id="ct-mix"></canvas></div></div>
+    </div>
+    <div class="card" style="margin-top:14px">
+      <h2>Top posts</h2><p class="desc">Ranked by views.</p>
+      <div class="table-box"><table><thead><tr><th>Date</th><th>Format</th><th>Purpose</th><th class="num">Views</th><th class="num">Likes</th><th class="num">Comments</th><th class="num">Shares</th></tr></thead><tbody id="ct-rows"></tbody></table></div>
+    </div>
+  </section>
+
+  <footer>Outside Collective · Washington DC · Built by Kamsi Ben Chiobi</footer>
+</div>
+
+<script>
+const C = {green:'#2f6b3f', deep:'#14532d', sun:'#e0a526', calm:'#cbd5e1', coral:'#d9603b', violet:'#7c3aed', cyan:'#0891b2'};
+const TYPE = {social: ['Social', C.violet], outdoor: ['Outdoor', C.green], ticketed_outing: ['Ticketed outing', C.sun], scavenger_hunt: ['Scavenger hunt', C.cyan], cafe_crawl: ['Cafe crawl', C.coral]};
+const PURPOSE = {event_promo: 'Event promo', event_recap: 'Event recap', community: 'Community'};
+const FORMAT = {reel: 'Reel', carousel: 'Carousel', image: 'Image'};
+Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+Chart.defaults.color = '#5f6b64';
+Chart.defaults.plugins.legend.labels.boxWidth = 12;
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
+const sum = (a, k) => a.reduce((s, r) => s + (Number(r[k]) || 0), 0);
+const median = a => { const s = a.filter(v => v != null).sort((x, y) => x - y); return s.length ? (s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2) : 0; };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const day = d => new Date(d + 'T12:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'});
+const short = d => new Date(d + 'T12:00').toLocaleDateString('en-US', {month: 'short', day: 'numeric'});
+const charts = {};
+let D;
+function chart(id, config) {
+  if (charts[id]) charts[id].destroy();
+  config.options = Object.assign({responsive: true, maintainAspectRatio: false, animation: {duration: 250}}, config.options || {});
+  charts[id] = new Chart($(id), config);
+}
+function kpis(el, items) { $(el).innerHTML = items.map(k => `<div class="card kpi ${k.tone || ''}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="note">${k.note || ''}</div></div>`).join(''); }
+const early = e => { const o = e.orders_0d + e.orders_1_2d + e.orders_3_7d + e.orders_8_14d + e.orders_15d_plus; return o ? (e.orders_8_14d + e.orders_15d_plus) / o : null; };
+const buyers = e => e.first_time_buyers + e.returning_buyers;
+const wrapLabel = n => { const w = n.split(' '), out = []; let cur = ''; w.forEach(x => { if ((cur + ' ' + x).trim().length > 14) { out.push(cur.trim()); cur = x; } else cur += ' ' + x; }); out.push(cur.trim()); return out; };
+
+document.querySelectorAll('nav.tabs button').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('nav.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  document.querySelectorAll('section[role=tabpanel]').forEach(s => s.hidden = s.id !== b.dataset.tab);
+  ({overview: renderOverview, events: renderEvents, growth: renderGrowth, content: renderContent})[b.dataset.tab]();
+}));
+
+/* ---------- overview ---------- */
+function renderOverview() {
+  const E = D.events, held = E.filter(e => e.held), P = D.posts;
+  const first3 = E.slice(0, 3), last3 = E.slice(-3);
+  const scanned = held.filter(e => e.check_ins != null);
+  kpis('ov-kpis', [
+    {label: 'Events', value: E.length, note: `${held.length} held · ${E.length - held.length} on sale · since ${new Date(E[0].event_date + 'T12:00').toLocaleDateString('en-US', {month: 'short', year: 'numeric'})}`},
+    {label: 'Tickets', value: fmt(sum(E, 'tickets_sold')), note: `${fmt(D.unique_attendees)} unique attendees`},
+    {label: 'Page-to-ticket conversion', value: (sum(E, 'tickets_sold') / sum(E, 'page_views') * 100).toFixed(1) + '%', note: `${fmt(sum(E, 'page_views'))} event page visits`, tone: 'good'},
+    {label: 'Returning buyers', value: pct(sum(last3, 'returning_buyers'), last3.reduce((s, e) => s + buyers(e), 0)) + '%', note: `last 3 events, up from ${pct(sum(first3, 'returning_buyers'), first3.reduce((s, e) => s + buyers(e), 0))}%`, tone: 'good'},
+    {label: 'Capped events filled', value: pct(sum(E.filter(e => e.capacity), 'tickets_sold'), sum(E.filter(e => e.capacity), 'capacity')) + '%', note: `${E.filter(e => e.capacity && e.tickets_sold >= e.capacity).length} sold out`, tone: 'sun'},
+    {label: 'Instagram views', value: fmt(sum(P, 'impressions') / 1000) + 'K', note: `${P.length} posts and reels since Feb`},
+  ]);
+  $('ov-decisions').innerHTML = [
+    {tag: 'Operations', h: 'Scan every ticket at the door',
+     p: `Check-in was used at only ${scanned.length} of ${held.length} events. Where it was, ${pct(sum(scanned, 'check_ins'), sum(scanned, 'tickets_sold'))}% of ticket holders were checked in, so no-shows are the biggest unknown in capacity planning.`,
+     a: 'Scan at every event; set RSVP caps from the measured show rate.'},
+    {tag: 'Conversion', h: 'Tag every link so Instagram gets credit',
+     p: 'Posh can only see direct page traffic, so the bio, stories and posts are invisible in sales attribution. Promo posts are shared about 3× more than recaps.',
+     a: 'Use a separate Posh tracking link for the bio, stories and each promo post.'},
+    {tag: 'Strategy', h: 'Free socials to acquire, planned outings to monetize',
+     p: `Free events convert page visits about twice as well and reach new people through Posh Explore. Planned outings sell weeks ahead: the January trip is ${pct(E[E.length - 1].tickets_sold, E[E.length - 1].capacity)}% sold with 7 weeks to go.`,
+     a: 'Alternate free socials with one planned paid outing per month.'},
+    {tag: 'Retention', h: 'Turn the returning core into members',
+     p: `${fmt(sum(E, 'returning_buyers'))} repeat purchases so far, and returning buyers have made up 15–49% of each event's buyers since August.`,
+     a: 'Offer early access to planned outings for repeat attendees.'},
+  ].map(d => `<div class="decision"><div class="tag">${d.tag}</div><h3>${d.h}</h3><p>${d.p}</p><div class="act"><strong>Next step:</strong> ${d.a}</div></div>`).join('');
+  chart('ov-tickets', {type: 'bar', data: {labels: E.map(e => short(e.event_date)), datasets: [{data: E.map(e => e.tickets_sold), backgroundColor: E.map(e => TYPE[e.event_type][1]), borderRadius: 4}]},
+    options: {plugins: {legend: {display: false}, tooltip: {callbacks: {title: c => E[c[0].dataIndex].name + ' · ' + short(E[c[0].dataIndex].event_date), label: c => c.raw + ' tickets'}}},
+      scales: {x: {ticks: {font: {size: 10}, maxRotation: 0, autoSkip: true}, grid: {display: false}}, y: {beginAtZero: true}}}});
+  const views = sum(P, 'impressions'), visits = sum(E, 'page_views'), tix = sum(E, 'tickets_sold'), chk = sum(scanned, 'check_ins'), chkT = sum(scanned, 'tickets_sold');
+  const steps = [['Instagram views', views], ['Event page visits', visits], ['Tickets', tix]];
+  const max = views;
+  $('ov-funnel').innerHTML = steps.map(([l, v], i) => `${i ? `<div class="rate">${(v / steps[i - 1][1] * 100).toFixed(1)}% of the step above</div>` : ''}
+    <div class="step"><span class="lbl">${l}</span><div><div class="bar" style="width:${Math.max(1, v / max * 100)}%"></div></div><span class="v">${fmt(v)}</span></div>`).join('')
+    + `<div class="rate">${pct(chk, chkT)}% checked in, at the ${scanned.length} events that scanned tickets</div>`;
+}
+
+/* ---------- events & operations ---------- */
+function evFiltered() {
+  const t = $('ev-type').value, p = $('ev-paid').value;
+  return D.events.filter(e => (!t || e.event_type === t) && (!p || (p === 'paid' ? e.paid : !e.paid)));
+}
+function renderEvents() {
+  const E = evFiltered(), held = E.filter(e => e.held), cap = E.filter(e => e.capacity), scanned = held.filter(e => e.check_ins != null);
+  const orders = k => sum(E, k);
+  const allO = ['orders_0d', 'orders_1_2d', 'orders_3_7d', 'orders_8_14d', 'orders_15d_plus'].reduce((s, k) => s + orders(k), 0);
+  kpis('ev-kpis', [
+    {label: 'Events', value: E.length, note: `${held.length} held`},
+    {label: 'Avg tickets per event', value: E.length ? fmt(sum(E, 'tickets_sold') / E.length) : '–'},
+    {label: 'Sell-through', value: cap.length ? pct(sum(cap, 'tickets_sold'), sum(cap, 'capacity')) + '%' : '–', note: `${cap.length} events with a cap`, tone: 'sun'},
+    {label: 'Booked 8+ days out', value: pct(orders('orders_8_14d') + orders('orders_15d_plus'), allO) + '%', note: 'of orders'},
+    {label: 'Checked in', value: scanned.length ? pct(sum(scanned, 'check_ins'), sum(scanned, 'tickets_sold')) + '%' : '–', note: `${scanned.length} events scanned tickets`, tone: 'coral'},
+  ]);
+  const lt = E.filter(e => early(e) != null).slice().sort((a, b) => early(b) - early(a));
+  chart('ev-lead', {type: 'bar', data: {labels: lt.map(e => e.name), datasets: [{data: lt.map(e => Math.round(early(e) * 100)), backgroundColor: lt.map(e => TYPE[e.event_type][1]), borderRadius: 4}]},
+    options: {indexAxis: 'y', plugins: {legend: {display: false}, tooltip: {callbacks: {label: c => c.raw + '% booked 8+ days out'}}}, scales: {x: {min: 0, max: 100, ticks: {callback: v => v + '%'}}, y: {grid: {display: false}, ticks: {font: {size: 10}}}}}});
+  const capE = E.filter(e => e.capacity || e.check_ins != null);
+  chart('ev-cap', {type: 'bar', data: {labels: capE.map(e => wrapLabel(e.name)), datasets: [
+    {label: 'Sell-through', backgroundColor: C.green, borderRadius: 3, data: capE.map(e => e.capacity ? Math.round(e.tickets_sold / e.capacity * 100) : null)},
+    {label: 'Checked in', backgroundColor: C.coral, borderRadius: 3, data: capE.map(e => e.check_ins != null ? Math.round(e.check_ins / e.tickets_sold * 100) : null)},
+  ]}, options: {scales: {y: {min: 0, max: 110, ticks: {callback: v => v <= 100 ? v + '%' : ''}}, x: {ticks: {font: {size: 9}, maxRotation: 0, autoSkip: false}, grid: {display: false}}},
+    plugins: {tooltip: {callbacks: {label: c => `${c.dataset.label}: ${c.raw}%`}}}}});
+  $('ev-count').textContent = `${E.length} events · most recent first`;
+  $('ev-rows').innerHTML = E.slice().reverse().map(e => `<tr>
+    <td><div class="strong">${esc(e.name)}</div><div class="sub">${day(e.event_date)}${e.held ? '' : ' · on sale'}</div></td>
+    <td><span class="pill ${{social: 'p-coral', outdoor: 'p-green', ticketed_outing: 'p-sun'}[e.event_type] || 'p-mute'}">${TYPE[e.event_type][0]}</span></td>
+    <td>${esc(e.neighborhood)}</td>
+    <td class="num">${fmt(e.tickets_sold)}</td><td class="num">${e.capacity ? fmt(e.capacity) : '–'}</td>
+    <td class="num">${e.capacity ? pct(e.tickets_sold, e.capacity) + '%' : '–'}</td>
+    <td class="num">${e.check_ins != null ? pct(e.check_ins, e.tickets_sold) + '%' : '–'}</td>
+    <td class="num">${fmt(e.page_views)}</td><td class="num">${(e.tickets_sold / e.page_views * 100).toFixed(1)}%</td>
+    <td class="num">${early(e) != null ? Math.round(early(e) * 100) + '%' : '–'}</td>
+    <td class="num">${e.paid ? '$' + fmt(e.net_revenue) : 'Free'}</td></tr>`).join('');
+}
+['ev-type', 'ev-paid'].forEach(id => $(id).addEventListener('input', renderEvents));
+
+/* ---------- conversion & retention ---------- */
+function renderGrowth() {
+  const E = D.events, S = D.sources;
+  const free = E.filter(e => !e.paid && e.held), paid = E.filter(e => e.paid);
+  const srcTot = k => sum(S.filter(s => s.source === k), 'tickets');
+  const allSrc = sum(S, 'tickets');
+  kpis('gr-kpis', [
+    {label: 'Conversion: free events', value: (sum(free, 'tickets_sold') / sum(free, 'page_views') * 100).toFixed(1) + '%', note: 'page visits to tickets', tone: 'good'},
+    {label: 'Conversion: paid events', value: (sum(paid, 'tickets_sold') / sum(paid, 'page_views') * 100).toFixed(1) + '%', note: 'page visits to tickets'},
+    {label: 'Posh Explore share', value: pct(srcTot('posh_explore'), allSrc) + '%', note: 'of tickets came from marketplace discovery'},
+    {label: 'Repeat purchases', value: fmt(sum(E, 'returning_buyers')), note: 'buyers returning from an earlier event', tone: 'good'},
+  ]);
+  chart('gr-conv', {data: {labels: E.map(e => short(e.event_date)), datasets: [
+    {type: 'bar', label: 'Page visits', backgroundColor: C.calm, data: E.map(e => e.page_views), yAxisID: 'y', borderRadius: 3},
+    {type: 'bar', label: 'Tickets', backgroundColor: C.green, data: E.map(e => e.tickets_sold), yAxisID: 'y', borderRadius: 3},
+    {type: 'line', label: 'Conversion', borderColor: C.sun, backgroundColor: C.sun, data: E.map(e => +(e.tickets_sold / e.page_views * 100).toFixed(1)), yAxisID: 'y1', tension: .3},
+  ]}, options: {scales: {y: {beginAtZero: true}, y1: {position: 'right', beginAtZero: true, grid: {drawOnChartArea: false}, ticks: {callback: v => v + '%'}},
+    x: {ticks: {font: {size: 10}, maxRotation: 0, autoSkip: true}, grid: {display: false}}}, plugins: {tooltip: {callbacks: {title: c => E[c[0].dataIndex].name}}}}});
+  chart('gr-ret', {type: 'bar', data: {labels: E.map(e => short(e.event_date)), datasets: [
+    {label: 'First-time', backgroundColor: C.calm, data: E.map(e => e.first_time_buyers), borderRadius: 3},
+    {label: 'Returning', backgroundColor: C.green, data: E.map(e => e.returning_buyers), borderRadius: 3},
+  ]}, options: {plugins: {tooltip: {callbacks: {title: c => E[c[0].dataIndex].name}}}, scales: {x: {stacked: true, ticks: {font: {size: 10}, maxRotation: 0, autoSkip: true}, grid: {display: false}}, y: {stacked: true, beginAtZero: true}}}});
+  const names = {event_page: 'Event page (direct and shared links)', posh_explore: 'Posh Explore (marketplace)', in_person: 'Paid at the door'};
+  const keys = Object.keys(names).filter(k => srcTot(k));
+  chart('gr-src', {type: 'doughnut', data: {labels: keys.map(k => names[k]), datasets: [{data: keys.map(srcTot), backgroundColor: [C.green, C.sun, C.coral], borderWidth: 2}]},
+    options: {cutout: '60%', plugins: {legend: {position: 'right'}, tooltip: {callbacks: {label: c => `${c.label}: ${pct(c.raw, allSrc)}% (${fmt(c.raw)} tickets)`}}}}});
+  chart('gr-share', {type: 'line', data: {labels: E.map(e => short(e.event_date)), datasets: [{label: 'Returning share', data: E.map(e => pct(e.returning_buyers, buyers(e))),
+    borderColor: C.green, backgroundColor: 'rgba(47,107,63,.1)', fill: true, tension: .3, pointRadius: 4}]},
+    options: {plugins: {legend: {display: false}, tooltip: {callbacks: {title: c => E[c[0].dataIndex].name, label: c => c.raw + '% returning'}}}, scales: {y: {min: 0, max: 100, ticks: {callback: v => v + '%'}}, x: {grid: {display: false}}}}});
+}
+
+/* ---------- content ---------- */
+function renderContent() {
+  const f = $('ct-format').value, pu = $('ct-purpose').value;
+  const P = D.posts.filter(p => (!f || p.format === f) && (!pu || p.purpose === pu));
+  kpis('ct-kpis', [
+    {label: 'Posts and reels', value: P.length, note: 'in the current filter'},
+    {label: 'Views', value: fmt(sum(P, 'impressions') / 1000) + 'K', note: `median ${fmt(median(P.map(p => p.impressions)))} per post`},
+    {label: 'Likes', value: fmt(sum(P, 'likes'))},
+    {label: 'Shares', value: fmt(sum(P, 'shares')), note: `median ${median(P.map(p => p.shares))} per post`, tone: 'good'},
+  ]);
+  const M = D.monthly;
+  chart('ct-monthly', {data: {labels: M.map(m => new Date(m.month + '-15').toLocaleDateString('en-US', {month: 'short'}) + (m === M[M.length - 1] ? '*' : '')), datasets: [
+    {type: 'bar', label: 'Views', backgroundColor: C.green, data: M.map(m => m.impressions), yAxisID: 'y', borderRadius: 3},
+    {type: 'line', label: 'Posts published', borderColor: C.sun, backgroundColor: C.sun, data: M.map(m => m.posts + m.reels), yAxisID: 'y1', tension: .3},
+  ]}, options: {scales: {y: {beginAtZero: true}, y1: {position: 'right', beginAtZero: true, grid: {drawOnChartArea: false}}, x: {grid: {display: false}}}}});
+  const groups = [...Object.keys(FORMAT).map(k => ['Format: ' + FORMAT[k], P.filter(p => p.format === k)]), ...Object.keys(PURPOSE).map(k => ['Purpose: ' + PURPOSE[k], P.filter(p => p.purpose === k)])].filter(g => g[1].length);
+  chart('ct-mix', {type: 'bar', data: {labels: groups.map(g => g[0]), datasets: [
+    {label: 'Median views (hundreds)', backgroundColor: C.green, data: groups.map(g => Math.round(median(g[1].map(p => p.impressions)) / 100)), borderRadius: 3},
+    {label: 'Median shares', backgroundColor: C.coral, data: groups.map(g => median(g[1].map(p => p.shares))), borderRadius: 3},
+  ]}, options: {indexAxis: 'y', scales: {x: {beginAtZero: true}, y: {grid: {display: false}, ticks: {font: {size: 10}}}}}});
+  $('ct-rows').innerHTML = P.filter(p => p.impressions).slice().sort((a, b) => b.impressions - a.impressions).slice(0, 12).map(p => `<tr>
+    <td>${day(p.post_date)}</td><td>${FORMAT[p.format]}</td><td><span class="pill ${p.purpose === 'event_promo' ? 'p-sun' : p.purpose === 'event_recap' ? 'p-green' : 'p-mute'}">${PURPOSE[p.purpose]}</span></td>
+    <td class="num">${fmt(p.impressions)}</td><td class="num">${fmt(p.likes)}</td><td class="num">${fmt(p.comments)}</td><td class="num">${fmt(p.shares)}</td></tr>`).join('');
+}
+['ct-format', 'ct-purpose'].forEach(id => $(id).addEventListener('input', renderContent));
+
+/* ---------- boot ---------- */
+fetch('data.json').then(r => r.json()).then(data => {
+  D = data;
+  D.events.sort((a, b) => a.event_date.localeCompare(b.event_date));
+  $('asof').textContent = day(D.as_of);
+  $('ev-type').innerHTML = '<option value="">All</option>' + Object.entries(TYPE).map(([k, v]) => `<option value="${k}">${v[0]}</option>`).join('');
+  renderOverview();
+}).catch(() => { document.querySelector('.wrap').insertAdjacentHTML('beforeend', '<p class="card">The dashboard data could not be loaded. Open this page through GitHub Pages or a local web server.</p>'); });
+</script>
+</body>
+</html>
